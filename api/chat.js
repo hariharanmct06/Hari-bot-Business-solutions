@@ -18,7 +18,38 @@ module.exports = async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { messages } = req.body;
+    // Failsafe body extraction
+    let messages;
+    try {
+        if (req.body && typeof req.body === 'object') {
+            messages = req.body.messages;
+        } else {
+            // Read from raw stream if not parsed
+            let rawBody = '';
+            await new Promise((resolve, reject) => {
+                req.on('data', chunk => { rawBody += chunk; });
+                req.on('end', () => {
+                    try {
+                        if (rawBody) {
+                            const parsed = JSON.parse(rawBody);
+                            messages = parsed.messages;
+                        }
+                        resolve();
+                    } catch (e) {
+                        reject(new Error('Invalid JSON payload: ' + e.message));
+                    }
+                });
+                req.on('error', err => reject(err));
+            });
+        }
+    } catch (err) {
+        return res.status(400).json({ error: 'Body parsing failed: ' + err.message });
+    }
+
+    if (!messages || !Array.isArray(messages)) {
+        return res.status(400).json({ error: 'Missing or invalid messages array in request body.' });
+    }
+
     const apiKey = process.env.OPENROUTER_API_KEY;
 
     if (!apiKey) {

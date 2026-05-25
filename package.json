@@ -1,0 +1,10 @@
+{
+  "name": "hari-bot-business-solutions",
+  "version": "1.0.0",
+  "description": "Corporate website for Hari Bot & Business Solutions",
+  "main": "server.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
