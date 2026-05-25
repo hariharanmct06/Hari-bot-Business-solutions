@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     // Enable CORS
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -44,8 +44,8 @@ export default async function handler(req, res) {
             let upstreamError = `Upstream error status: ${response.status}`;
             try {
                 const errData = await response.json();
-                if (errData.error && errData.error.message) {
-                    upstreamError = errData.error.message;
+                if (errData.error) {
+                    upstreamError = typeof errData.error === 'string' ? errData.error : (errData.error.message || upstreamError);
                 }
             } catch (_) {}
             return res.status(response.status).json({ error: upstreamError });
