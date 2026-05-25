@@ -164,10 +164,12 @@ ul {
 
 .logo-img {
     height: 42px;
-    width: 42px;
-    border-radius: 50%;
+    width: auto;
+    aspect-ratio: 3 / 2;
+    border-radius: 4px;
     border: 1.5px solid var(--gold-primary);
-    object-fit: cover;
+    object-fit: contain;
+    background-color: #000;
     box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
 }
 
@@ -389,8 +391,8 @@ ul {
 
 .logo-showcase-container {
     position: relative;
-    width: 320px;
-    height: 320px;
+    width: 360px;
+    height: 240px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -398,9 +400,9 @@ ul {
 
 .logo-border-glow {
     position: absolute;
-    width: 110%;
-    height: 110%;
-    border-radius: 50%;
+    width: 105%;
+    height: 108%;
+    border-radius: 12px;
     background: conic-gradient(from 0deg, transparent, var(--blue-accent), transparent, var(--gold-primary), transparent);
     animation: rotateGlow 8s linear infinite;
     opacity: 0.7;
@@ -410,7 +412,7 @@ ul {
 .hero-showcase-img {
     width: 100%;
     height: 100%;
-    border-radius: 50%;
+    border-radius: 8px;
     border: 3px solid var(--bg-main);
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
     object-fit: cover;
@@ -822,22 +824,23 @@ ul {
 
 .bot-avatar {
     position: relative;
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 32px;
 }
 
 .bot-avatar img {
     width: 100%;
     height: 100%;
-    border-radius: 50%;
+    border-radius: 4px;
     border: 1px solid var(--gold-primary);
     object-fit: cover;
+    background-color: #000;
 }
 
 .online-indicator {
     position: absolute;
-    bottom: 0;
-    right: 0;
+    bottom: -2px;
+    right: -2px;
     width: 10px;
     height: 10px;
     background-color: #10b981;
@@ -1459,9 +1462,12 @@ ul {
 
 .footer-logo-img {
     height: 36px;
-    width: 36px;
-    border-radius: 50%;
+    width: auto;
+    aspect-ratio: 3 / 2;
+    border-radius: 4px;
     border: 1.5px solid var(--gold-primary);
+    object-fit: contain;
+    background-color: #000;
 }
 
 .brand-pitch {
@@ -1712,8 +1718,8 @@ ul {
     }
     
     .logo-showcase-container {
-        width: 250px;
-        height: 250px;
+        width: 270px;
+        height: 180px;
     }
     
     .chatbot-container {
