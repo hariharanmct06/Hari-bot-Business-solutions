@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 4. Interactive Live Chatbot (Gemini API Integration)
+    // 4. Interactive Live Chatbot (OpenRouter API Integration)
     // ==========================================
     const botMessages = document.getElementById('botMessages');
     const botChips = document.getElementById('botChips');
@@ -110,8 +110,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const botInput = document.getElementById('botInput');
     
     // API Configuration
-    const GEMINI_API_KEY = "AIzaSyDolNOk3IMmGynb0nl8U0KOh12gRG56Abc";
-    const GEMINI_MODEL = "gemini-2.5-flash";
+    // For local testing, paste your API key below. Keep empty ("") when pushing to GitHub to avoid leaks.
+    const OPENROUTER_API_KEY = ""; 
+    const OPENROUTER_MODEL = "openrouter/free";
     const SYSTEM_PROMPT = `You are Hari Bot, the AI Assistant for Hari Bot & Business Solutions, and a general-purpose AI assistant. Your goal is to answer visitor questions professionally, creatively, and helpfully.
 
 While your primary background is representing Hari Bot & Business Solutions (founded May 24, 2026, by founder & creative director Hariharan M, a Mechatronics student at SNS), you are also a fully capable AI model. You can answer ANY questions, solve coding/math/science problems, write essays, and provide general advice, just like Google Gemini itself. When answering general queries, act as a knowledgeable AI assistant, but keep your tone professional, polite, and aligned with our tech brand.
@@ -143,7 +144,7 @@ Guidelines:
 - You must always format your answers in clean HTML (e.g., use <strong> for bold, <br> for new lines, <ul>/<li> for lists, and <a href="..." target="_blank" class="gold-text"> for links). Do not return markdown. Do not wrap your response in \`\`\`html code blocks.
 - If asked about prices, say they are customized based on requirements and encourage them to WhatsApp the founder (+91 8667808803) or email (haribotbusinesssolutions@gmail.com) for a free quote.`;
 
-    // Local Chat History array for conversation context
+    // Local Chat History array for conversation context (OpenAI Format)
     let chatHistory = [];
 
     function appendMessage(text, isUser = false) {
@@ -178,37 +179,56 @@ Guidelines:
         }
     }
 
-    async function getGeminiResponse(userMessage) {
+    async function getOpenRouterResponse(userMessage) {
         showTypingIndicator();
         
         // Push user message to context history
         chatHistory.push({
             role: "user",
-            parts: [{ text: userMessage }]
+            content: userMessage
         });
         
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+        const messagesToSend = [
+            { role: "system", content: SYSTEM_PROMPT },
+            ...chatHistory
+        ];
         
+        let response;
         try {
-            const response = await fetch(apiUrl, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    contents: chatHistory,
-                    systemInstruction: {
-                        parts: [{ text: SYSTEM_PROMPT }]
-                    }
-                })
-            });
+            if (!OPENROUTER_API_KEY) {
+                // Secure production backend route (hides your key on Vercel)
+                response = await fetch("/api/chat", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        messages: messagesToSend
+                    })
+                });
+            } else {
+                // Direct call for local offline testing (when key is pasted locally)
+                response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+                        "HTTP-Referer": "http://localhost:8000",
+                        "X-Title": "Hari Bot & Business Solutions"
+                    },
+                    body: JSON.stringify({
+                        model: OPENROUTER_MODEL,
+                        messages: messagesToSend
+                    })
+                });
+            }
             
             if (!response.ok) {
                 let errorMsg = `HTTP error! Status: ${response.status}`;
                 try {
                     const errData = await response.json();
-                    if (errData.error && errData.error.message) {
-                        errorMsg = errData.error.message;
+                    if (errData.error) {
+                        errorMsg = typeof errData.error === 'string' ? errData.error : (errData.error.message || errorMsg);
                     }
                 } catch (_) {}
                 throw new Error(errorMsg);
@@ -217,22 +237,22 @@ Guidelines:
             const data = await response.json();
             removeTypingIndicator();
             
-            if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
-                let botText = data.candidates[0].content.parts[0].text;
+            if (data.choices && data.choices[0] && data.choices[0].message) {
+                let botText = data.choices[0].message.content;
                 
                 // Add model response to history context
                 chatHistory.push({
-                    role: "model",
-                    parts: [{ text: botText }]
+                    role: "assistant",
+                    content: botText
                 });
                 
                 appendMessage(botText, false);
             } else {
-                throw new Error("Invalid response format from Gemini API");
+                throw new Error("Invalid response format from OpenRouter API");
             }
             
         } catch (error) {
-            console.error("Gemini API Error:", error);
+            console.error("OpenRouter API Error:", error);
             removeTypingIndicator();
             
             // Pop the last user query from history since it failed
@@ -252,7 +272,7 @@ Guidelines:
             if (e.target.classList.contains('chip-btn')) {
                 const queryText = e.target.textContent;
                 appendMessage(queryText, true);
-                getGeminiResponse(queryText);
+                getOpenRouterResponse(queryText);
             }
         });
     }
@@ -264,12 +284,11 @@ Guidelines:
             const userText = botInput.value.trim();
             if (userText) {
                 appendMessage(userText, true);
-                getGeminiResponse(userText);
+                getOpenRouterResponse(userText);
                 botInput.value = '';
             }
         });
-    }
-
+    }    
     // ==========================================
     // 5. Contact Form Handler (Submission Simulation)
     // ==========================================
