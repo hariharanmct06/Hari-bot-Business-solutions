@@ -1,3 +1,5 @@
+const https = require('https');
+
 module.exports = async function handler(req, res) {
     // Enable CORS
     res.setHeader('Access-Control-Allow-Credentials', true);
@@ -25,35 +27,57 @@ module.exports = async function handler(req, res) {
         });
     }
 
-    try {
-        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${apiKey}`,
-                "HTTP-Referer": "https://haribotbusinesssolutions.vercel.app",
-                "X-Title": "Hari Bot & Business Solutions"
-            },
-            body: JSON.stringify({
-                model: "openrouter/free",
-                messages: messages
-            })
+    const postData = JSON.stringify({
+        model: "openrouter/free",
+        messages: messages
+    });
+
+    const options = {
+        hostname: 'openrouter.ai',
+        port: 443,
+        path: '/api/v1/chat/completions',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
+            'HTTP-Referer': 'https://haribotbusinesssolutions.vercel.app',
+            'X-Title': 'Hari Bot & Business Solutions',
+            'Content-Length': Buffer.byteLength(postData)
+        }
+    };
+
+    return new Promise((resolve) => {
+        const postReq = https.request(options, (postRes) => {
+            let data = '';
+            postRes.on('data', (chunk) => {
+                data += chunk;
+            });
+            postRes.on('end', () => {
+                try {
+                    const parsedData = JSON.parse(data);
+                    if (postRes.statusCode >= 200 && postRes.statusCode < 300) {
+                        res.status(200).json(parsedData);
+                    } else {
+                        let errorMsg = `Upstream error: ${postRes.statusCode}`;
+                        if (parsedData.error) {
+                            errorMsg = typeof parsedData.error === 'string' ? parsedData.error : (parsedData.error.message || errorMsg);
+                        }
+                        res.status(postRes.statusCode).json({ error: errorMsg });
+                    }
+                    resolve();
+                } catch (e) {
+                    res.status(500).json({ error: 'Error parsing upstream response: ' + e.message });
+                    resolve();
+                }
+            });
         });
 
-        if (!response.ok) {
-            let upstreamError = `Upstream error status: ${response.status}`;
-            try {
-                const errData = await response.json();
-                if (errData.error) {
-                    upstreamError = typeof errData.error === 'string' ? errData.error : (errData.error.message || upstreamError);
-                }
-            } catch (_) {}
-            return res.status(response.status).json({ error: upstreamError });
-        }
+        postReq.on('error', (err) => {
+            res.status(500).json({ error: 'Network error connecting to OpenRouter: ' + err.message });
+            resolve();
+        });
 
-        const data = await response.json();
-        return res.status(200).json(data);
-    } catch (error) {
-        return res.status(500).json({ error: error.message });
-    }
-}
+        postReq.write(postData);
+        postReq.end();
+    });
+};
