@@ -23,7 +23,70 @@
     <!-- Custom Style Sheet -->
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="loading">
+
+    <!-- Visual Loading Screen (Preloader) -->
+    <div id="preloader" class="preloader">
+        <div class="preloader-content">
+            <!-- Laptop Showcase Container -->
+            <div class="preloader-laptop-container">
+                <svg class="preloader-laptop-svg" viewBox="0 0 120 80">
+                    <!-- Laptop Screen Outer Rim -->
+                    <rect x="20" y="10" width="80" height="50" rx="4" ry="4" class="preloader-screen-rim" />
+                    <!-- Laptop Screen Inner display -->
+                    <rect x="23" y="13" width="74" height="44" rx="2" ry="2" class="preloader-screen-display" />
+                    <!-- Laptop Base hinge -->
+                    <path d="M50,60 L70,60 L68,61.5 L52,61.5 Z" class="preloader-hinge" />
+                    <!-- Laptop Keyboard Base -->
+                    <path d="M10,61.5 L110,61.5 L102,70 L18,70 Z" class="preloader-laptop-base" />
+                    <!-- Laptop Trackpad -->
+                    <rect x="52" y="66" width="16" height="3" rx="0.5" ry="0.5" class="preloader-trackpad" />
+                </svg>
+                
+                <!-- Rocket launching out of screen -->
+                <div class="preloader-rocket-wrapper">
+                    <svg class="preloader-rocket-svg" viewBox="0 0 40 80">
+                        <!-- Flame effects -->
+                        <path d="M16,62 Q20,80 24,62 Q20,70 16,62 Z" class="preloader-fire-outer" />
+                        <path d="M18,62 Q20,74 22,62 Q20,67 18,62 Z" class="preloader-fire-inner" />
+                        
+                        <!-- Wings / Fins -->
+                        <path d="M10,48 L4,58 L10,54 Z" class="preloader-wing-left" />
+                        <path d="M30,48 L36,58 L30,54 Z" class="preloader-wing-right" />
+                        <path d="M20,48 L17,58 L20,54 L23,58 Z" class="preloader-wing-center" />
+                        
+                        <!-- Body -->
+                        <path d="M20,10 C26,22 28,42 29,54 L11,54 C12,42 14,22 20,10 Z" class="preloader-rocket-body" />
+                        <!-- Nose cone -->
+                        <path d="M20,10 C22.5,17 24.5,23 25.5,28 L14.5,28 C15.5,23 17.5,17 20,10 Z" class="preloader-nose-cone" />
+                        <!-- Window -->
+                        <circle cx="20" cy="32" r="4.5" class="preloader-window-rim" />
+                        <circle cx="20" cy="32" r="3" class="preloader-window-glass" />
+                    </svg>
+                </div>
+                
+                <!-- Smoke plumes container -->
+                <div class="preloader-smoke-container">
+                    <div class="preloader-smoke smoke-left-1"></div>
+                    <div class="preloader-smoke smoke-left-2"></div>
+                    <div class="preloader-smoke smoke-right-1"></div>
+                    <div class="preloader-smoke smoke-right-2"></div>
+                    <div class="preloader-smoke smoke-center-1"></div>
+                    <div class="preloader-smoke smoke-center-2"></div>
+                </div>
+            </div>
+            
+            <h2 class="preloader-title">Launching Hari Bot</h2>
+            
+            <!-- Progress Bar -->
+            <div class="preloader-progress-container">
+                <div class="preloader-progress-bar" id="preloaderProgressBar"></div>
+            </div>
+            
+            <p class="preloader-subtitle" id="preloaderSubtitle">Connecting to core systems...</p>
+        </div>
+    </div>
+
 
     <!-- Header / Sticky Navigation -->
     <header class="navbar" id="navbar">

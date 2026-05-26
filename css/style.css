@@ -1801,3 +1801,362 @@ ul {
         display: none;
     }
 }
+
+/* ==========================================
+   6. Visual Loading Screen (Preloader)
+   ========================================== */
+body.loading {
+    overflow: hidden;
+    height: 100vh;
+}
+
+.preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at center, #09132e 0%, #02050d 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.8s cubic-bezier(0.77, 0, 0.175, 1),
+                visibility 0.8s;
+}
+
+.preloader.fade-out {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.preloader-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Laptop Container */
+.preloader-laptop-container {
+    position: relative;
+    width: 240px;
+    height: 160px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.preloader-laptop-svg {
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.6));
+}
+
+.preloader-screen-rim {
+    fill: #1e293b;
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 0.5px;
+}
+
+.preloader-screen-display {
+    fill: #030712;
+    stroke: rgba(59, 130, 246, 0.3);
+    stroke-width: 1px;
+}
+
+.preloader-hinge {
+    fill: #0f172a;
+}
+
+.preloader-laptop-base {
+    fill: #0f172a;
+    stroke: rgba(255, 255, 255, 0.15);
+    stroke-width: 0.5px;
+}
+
+.preloader-trackpad {
+    fill: #1e293b;
+    stroke: rgba(212, 175, 55, 0.2);
+    stroke-width: 0.25px;
+}
+
+/* Rocket Wrapper */
+.preloader-rocket-wrapper {
+    position: absolute;
+    bottom: 40px; /* Sits right at keyboard level */
+    left: calc(50% - 20px);
+    width: 40px;
+    height: 80px;
+    z-index: 10;
+    transform-origin: bottom center;
+    animation: preloaderLaunchTimeline 4.2s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+.preloader-rocket-svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Rocket Parts */
+.preloader-rocket-body {
+    fill: #e2e8f0;
+    stroke: #64748b;
+    stroke-width: 0.5px;
+}
+
+.preloader-nose-cone {
+    fill: var(--gold-primary);
+}
+
+.preloader-wing-left, .preloader-wing-right, .preloader-wing-center {
+    fill: var(--gold-primary);
+    stroke: rgba(0, 0, 0, 0.1);
+    stroke-width: 0.5px;
+}
+
+.preloader-window-rim {
+    fill: #475569;
+}
+
+.preloader-window-glass {
+    fill: #38bdf8;
+    stroke: #0284c7;
+    stroke-width: 0.5px;
+}
+
+/* Flame Styles */
+.preloader-fire-outer {
+    fill: #ff6b00;
+    filter: blur(0.5px);
+    transform-origin: 20px 62px;
+    animation: preloaderFlameFlicker 0.08s ease-in-out infinite alternate, preloaderFlameTimeline 4.2s forwards;
+}
+
+.preloader-fire-inner {
+    fill: #ffeb3b;
+    filter: blur(0.2px);
+    transform-origin: 20px 62px;
+    animation: preloaderFlameFlicker 0.05s ease-in-out infinite alternate, preloaderFlameTimeline 4.2s forwards;
+}
+
+/* Smoke Container & puffs */
+.preloader-smoke-container {
+    position: absolute;
+    bottom: 30px;
+    width: 100%;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    z-index: 8;
+    pointer-events: none;
+}
+
+.preloader-smoke {
+    position: absolute;
+    background: radial-gradient(circle, rgba(249, 115, 22, 0.3) 0%, rgba(100, 116, 139, 0.15) 50%, rgba(0,0,0,0) 100%);
+    border-radius: 50%;
+    opacity: 0;
+    transform: scale(0);
+}
+
+.smoke-left-1 {
+    width: 25px;
+    height: 25px;
+    left: 30%;
+    animation: smokeBillowLeft 4.2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+}
+.smoke-left-2 {
+    width: 35px;
+    height: 35px;
+    left: 20%;
+    animation: smokeBillowLeft2 4.2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+    animation-delay: 0.1s;
+}
+.smoke-right-1 {
+    width: 25px;
+    height: 25px;
+    right: 30%;
+    animation: smokeBillowRight 4.2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+}
+.smoke-right-2 {
+    width: 35px;
+    height: 35px;
+    right: 20%;
+    animation: smokeBillowRight2 4.2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+    animation-delay: 0.15s;
+}
+.smoke-center-1 {
+    width: 30px;
+    height: 30px;
+    left: calc(50% - 15px);
+    animation: smokeBillowCenter 4.2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+}
+.smoke-center-2 {
+    width: 40px;
+    height: 40px;
+    left: calc(50% - 20px);
+    animation: smokeBillowCenter2 4.2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+    animation-delay: 0.05s;
+}
+
+/* Titles and Loading items */
+.preloader-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-white);
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+}
+
+.preloader-progress-container {
+    width: 220px;
+    height: 4px;
+    background: #1e293b;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.preloader-progress-bar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--blue-accent), var(--gold-primary));
+    animation: preloaderProgressBarTimeline 3.5s cubic-bezier(0.1, 0.85, 0.25, 1) forwards;
+}
+
+.preloader-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    font-weight: 400;
+    height: 20px;
+}
+
+/* Animations Keyframes */
+@keyframes preloaderLaunchTimeline {
+    /* Phase 1: Rumble (Engine prep) 0s - 1.5s (0% - 36%) */
+    0% { transform: translate(0, 0); }
+    3% { transform: translate(0.5px, -0.5px) rotate(0.2deg); }
+    6% { transform: translate(-0.5px, 0.5px) rotate(-0.2deg); }
+    9% { transform: translate(0.5px, 0.5px) rotate(0deg); }
+    12% { transform: translate(-0.5px, -0.5px) rotate(0.2deg); }
+    15% { transform: translate(0.5px, -0.5px) rotate(-0.2deg); }
+    18% { transform: translate(-0.5px, 0.5px) rotate(0deg); }
+    21% { transform: translate(0.5px, 0.5px) rotate(0.2deg); }
+    24% { transform: translate(-0.5px, -0.5px) rotate(-0.2deg); }
+    27% { transform: translate(0.5px, -0.5px) rotate(0deg); }
+    30% { transform: translate(-0.5px, 0.5px) rotate(0.2deg); }
+    33% { transform: translate(0.5px, 0.5px) rotate(-0.2deg); }
+    36% { transform: translate(0, 0); }
+    
+    /* Phase 2: Ignition & lift-off preparation 1.5s - 2.0s (36% - 48%) */
+    39% { transform: translateY(0); }
+    43% { transform: translateY(-4px); }
+    47% { transform: translateY(-8px); }
+    
+    /* Phase 3: Launch blastoff 2.0s - 3.5s (48% - 84%) */
+    52% { transform: translateY(-20px); }
+    58% { transform: translateY(-50px) scale(1.1); }
+    65% { transform: translateY(-110px) scale(1.2); }
+    75% { transform: translateY(-240px) scale(1.3); }
+    84% { transform: translateY(-500px) scale(1.4); }
+    
+    /* Phase 4: Off screen 3.5s - 4.2s (84% - 100%) */
+    100% { transform: translateY(-500px) scale(1.4); }
+}
+
+@keyframes preloaderFlameTimeline {
+    0%, 36% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    39% {
+        transform: scale(0.3);
+        opacity: 0.7;
+    }
+    43% {
+        transform: scale(0.8);
+        opacity: 1;
+    }
+    47%, 84% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+    85%, 100% {
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+
+@keyframes preloaderFlameFlicker {
+    from { transform: scaleX(0.9) scaleY(0.95); }
+    to { transform: scaleX(1.1) scaleY(1.05); }
+}
+
+@keyframes preloaderProgressBarTimeline {
+    0% { width: 0%; }
+    100% { width: 100%; }
+}
+
+/* Smoke Billowing animations */
+@keyframes smokeBillowLeft {
+    0%, 36% { transform: scale(0) translate(0, 0); opacity: 0; }
+    39% { transform: scale(0.4) translate(-5px, -5px); opacity: 0.8; background: radial-gradient(circle, rgba(249, 115, 22, 0.4) 0%, rgba(100, 116, 139, 0.2) 50%, rgba(0,0,0,0) 100%); }
+    50% { transform: scale(1.5) translate(-25px, -20px); opacity: 0.6; filter: blur(4px); }
+    65% { transform: scale(2.5) translate(-50px, -35px); opacity: 0.4; filter: blur(8px); }
+    80% { transform: scale(3.5) translate(-70px, -45px); opacity: 0.1; filter: blur(12px); }
+    100% { transform: scale(4.0) translate(-80px, -50px); opacity: 0; filter: blur(15px); }
+}
+
+@keyframes smokeBillowLeft2 {
+    0%, 38% { transform: scale(0) translate(0, 0); opacity: 0; }
+    41% { transform: scale(0.4) translate(-8px, -4px); opacity: 0.8; }
+    52% { transform: scale(1.6) translate(-35px, -15px); opacity: 0.6; filter: blur(5px); }
+    68% { transform: scale(2.8) translate(-65px, -25px); opacity: 0.3; filter: blur(9px); }
+    84% { transform: scale(3.8) translate(-85px, -35px); opacity: 0.1; filter: blur(14px); }
+    100% { transform: scale(4.2) translate(-95px, -40px); opacity: 0; filter: blur(18px); }
+}
+
+@keyframes smokeBillowRight {
+    0%, 36% { transform: scale(0) translate(0, 0); opacity: 0; }
+    39% { transform: scale(0.4) translate(5px, -5px); opacity: 0.8; background: radial-gradient(circle, rgba(249, 115, 22, 0.4) 0%, rgba(100, 116, 139, 0.2) 50%, rgba(0,0,0,0) 100%); }
+    50% { transform: scale(1.5) translate(25px, -20px); opacity: 0.6; filter: blur(4px); }
+    65% { transform: scale(2.5) translate(50px, -35px); opacity: 0.4; filter: blur(8px); }
+    80% { transform: scale(3.5) translate(70px, -45px); opacity: 0.1; filter: blur(12px); }
+    100% { transform: scale(4.0) translate(80px, -50px); opacity: 0; filter: blur(15px); }
+}
+
+@keyframes smokeBillowRight2 {
+    0%, 38% { transform: scale(0) translate(0, 0); opacity: 0; }
+    41% { transform: scale(0.4) translate(8px, -4px); opacity: 0.8; }
+    52% { transform: scale(1.6) translate(35px, -15px); opacity: 0.6; filter: blur(5px); }
+    68% { transform: scale(2.8) translate(65px, -25px); opacity: 0.3; filter: blur(9px); }
+    84% { transform: scale(3.8) translate(85px, -35px); opacity: 0.1; filter: blur(14px); }
+    100% { transform: scale(4.2) translate(95px, -40px); opacity: 0; filter: blur(18px); }
+}
+
+@keyframes smokeBillowCenter {
+    0%, 36% { transform: scale(0) translateY(0); opacity: 0; }
+    39% { transform: scale(0.5) translateY(2px); opacity: 0.9; background: radial-gradient(circle, rgba(251, 191, 36, 0.5) 0%, rgba(249, 115, 22, 0.3) 40%, rgba(0,0,0,0) 100%); }
+    50% { transform: scale(1.8) translateY(15px); opacity: 0.7; filter: blur(4px); }
+    65% { transform: scale(2.8) translateY(30px); opacity: 0.4; filter: blur(8px); }
+    80% { transform: scale(3.8) translateY(45px); opacity: 0.15; filter: blur(12px); }
+    100% { transform: scale(4.5) translateY(55px); opacity: 0; filter: blur(16px); }
+}
+
+@keyframes smokeBillowCenter2 {
+    0%, 38% { transform: scale(0) translateY(0); opacity: 0; }
+    41% { transform: scale(0.5) translateY(1px); opacity: 0.9; }
+    52% { transform: scale(2.0) translateY(20px); opacity: 0.6; filter: blur(5px); }
+    68% { transform: scale(3.0) translateY(40px); opacity: 0.3; filter: blur(10px); }
+    84% { transform: scale(4.0) translateY(60px); opacity: 0.1; filter: blur(15px); }
+    100% { transform: scale(4.8) translateY(70px); opacity: 0; filter: blur(20px); }
+}
+

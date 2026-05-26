@@ -1,6 +1,43 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     // ==========================================
+    // Preloader (Loading Screen) Handler
+    // ==========================================
+    const preloader = document.getElementById('preloader');
+    const preloaderSubtitle = document.getElementById('preloaderSubtitle');
+    
+    const preloaderStatuses = [
+        "Connecting to core systems...",
+        "Igniting rocket boosters...",
+        "Launching Hari Bot & Business Solutions..."
+    ];
+    let preloaderStatusIndex = 0;
+    
+    // Cycle preloader status subtitles
+    const preloaderStatusInterval = setInterval(() => {
+        preloaderStatusIndex = (preloaderStatusIndex + 1) % preloaderStatuses.length;
+        if (preloaderSubtitle) {
+            preloaderSubtitle.textContent = preloaderStatuses[preloaderStatusIndex];
+        }
+    }, 1200);
+    
+    // Auto-remove preloader after 5.0s (maximum)
+    setTimeout(() => {
+        clearInterval(preloaderStatusInterval);
+        if (preloader) {
+            preloader.classList.add('fade-out');
+        }
+        document.body.classList.remove('loading');
+        
+        // Fully remove from document flow after fade-out transition completes (800ms)
+        setTimeout(() => {
+            if (preloader) {
+                preloader.style.display = 'none';
+            }
+        }, 800);
+    }, 4200); // 4.2s launch animation + 800ms fadeout = 5.0s total
+
+    // ==========================================
     // 1. Sticky Header & Active Nav Links
     // ==========================================
     const navbar = document.getElementById('navbar');
