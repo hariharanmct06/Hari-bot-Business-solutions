@@ -2189,6 +2189,7 @@ body.loading {
 }
 
 .nav-login-btn-mobile {
+    display: none; /* Hide on desktop by default */
     width: 100%;
     background: transparent;
     border: 1.5px solid var(--gold-primary);
@@ -2198,7 +2199,6 @@ body.loading {
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
-    display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
@@ -2206,12 +2206,12 @@ body.loading {
 }
 
 .user-profile-menu {
-    display: flex;
+    display: none; /* Controlled by JS based on screen width */
     align-items: center;
-    gap: 12px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 6px 14px;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 6px 12px;
     border-radius: 20px;
 }
 
@@ -2259,7 +2259,7 @@ body.loading {
 
 /* Mobile Profile Menu */
 .user-profile-menu-mobile {
-    display: flex;
+    display: none; /* Hide on desktop by default */
     flex-direction: column;
     align-items: center;
     gap: 10px;

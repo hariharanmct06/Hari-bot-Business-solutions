@@ -27,7 +27,7 @@ module.exports = async function handler(req, res) {
     }
 
     // Extract payload details
-    let name, contact, method, hasPassword;
+    let action, name, contact, method, hasPassword, otp;
     try {
         let payload;
         if (req.body && typeof req.body === 'object') {
@@ -51,17 +51,79 @@ module.exports = async function handler(req, res) {
         }
         
         if (payload) {
+            action = payload.action;
             name = payload.name;
             contact = payload.contact;
             method = payload.method;
             hasPassword = payload.hasPassword;
+            otp = payload.otp;
         }
     } catch (err) {
         sendJSON(res, 400, { error: 'Body parsing failed: ' + err.message });
         return;
     }
 
-    // Default fallbacks if empty
+    // Check for SMTP configuration
+    const smtpHost = process.env.SMTP_HOST;
+    const smtpPort = process.env.SMTP_PORT || '587';
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
+
+    // ACTION: Send OTP directly to visitor
+    if (action === 'send-otp') {
+        const isEmail = contact && contact.includes('@');
+        if (!isEmail) {
+            // Return success directly for phone numbers (simulated SMS)
+            sendJSON(res, 200, { success: true, message: 'OTP simulated successfully (phone contact)' });
+            return;
+        }
+
+        if (!smtpHost || !smtpUser || !smtpPass) {
+            console.warn('SMTP settings missing. Mock-sending 4-digit OTP code to email:', contact, 'Code:', otp);
+            sendJSON(res, 200, { success: true, message: 'OTP Mock-Sent (SMTP not configured)', mockSent: true });
+            return;
+        }
+
+        try {
+            const transporter = nodemailer.createTransport({
+                host: smtpHost,
+                port: parseInt(smtpPort),
+                secure: smtpPort === '465',
+                auth: {
+                    user: smtpUser,
+                    pass: smtpPass
+                }
+            });
+
+            const mailOptions = {
+                from: `"Hari Bot System" <${smtpUser}>`,
+                to: contact,
+                subject: `Hari Bot Verification Code: ${otp}`,
+                text: `Hello ${name || 'Visitor'},\n\nYour 4-digit verification code for Hari Bot & Business Solutions is: ${otp}\n\nThis code is valid for 10 minutes.`,
+                html: `<div style="background-color: #0b0f19; color: #f8fafc; padding: 24px; font-family: sans-serif; border-radius: 8px; max-width: 480px; margin: 0 auto; border: 1.5px solid #d4af37;">
+                    <h2 style="color: #3b82f6; font-size: 1.4rem; margin-top: 0; text-align: center;">Verification Code 🔑</h2>
+                    <p>Hello <strong>${name || 'Visitor'}</strong>,</p>
+                    <p>Use the following 4-digit OTP to verify your email address on <strong>Hari Bot & Business Solutions</strong>:</p>
+                    <div style="background-color: #070a13; padding: 20px; text-align: center; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); margin: 24px 0;">
+                        <span style="font-size: 2.2rem; font-weight: 800; color: #d4af37; letter-spacing: 6px; font-family: monospace;">${otp}</span>
+                    </div>
+                    <p style="color: #64748b; font-size: 0.85rem;">This code will expire in 10 minutes. Please do not share this code with anyone.</p>
+                    <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 24px 0;">
+                    <p style="color: #64748b; font-size: 0.8rem; text-align: center; margin-bottom: 0;">Powered by Hari Bot & Business Solutions</p>
+                </div>`
+            };
+
+            const info = await transporter.sendMail(mailOptions);
+            console.log(`Verification OTP ${otp} sent successfully to ${contact}:`, info.messageId);
+            sendJSON(res, 200, { success: true, message: 'Verification OTP sent to email', messageId: info.messageId });
+        } catch (err) {
+            console.error('Error sending verification OTP email:', err);
+            sendJSON(res, 500, { error: 'Failed to send verification code email: ' + err.message });
+        }
+        return;
+    }
+
+    // ACTION: Notify founder of a new visitor login (default)
     name = name || 'Unknown Visitor';
     contact = contact || 'N/A';
     method = method || 'Guest Access';
@@ -75,12 +137,6 @@ module.exports = async function handler(req, res) {
 *Method:* ${method}
 *Password Set:* ${hasPassword}
 *Timestamp:* ${timestamp} (IST)`;
-
-    // Check for Vercel environment SMTP settings
-    const smtpHost = process.env.SMTP_HOST;
-    const smtpPort = process.env.SMTP_PORT || '587';
-    const smtpUser = process.env.SMTP_USER;
-    const smtpPass = process.env.SMTP_PASS;
 
     if (!smtpHost || !smtpUser || !smtpPass) {
         // Fallback: log to Vercel and return success mock

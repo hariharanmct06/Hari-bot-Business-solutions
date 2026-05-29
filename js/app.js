@@ -490,17 +490,22 @@ Guidelines:
         if (passwordModal) passwordModal.classList.remove('active');
     }
     
-    // Step 1 Submit: Generate mock OTP
+    // Step 1 Submit: Generate mock OTP and send directly to customer
     if (authFormStep1) {
-        authFormStep1.addEventListener('submit', (e) => {
+        authFormStep1.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const name = authName.value.trim();
             const contact = authContact.value.trim();
+            const submitBtn = document.getElementById('btnSendOtp');
             
             if (name && contact) {
-                // Generate a random 6-digit OTP code
-                generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+                const originalText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending code...';
+                
+                // Generate a random 4-digit OTP code
+                generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
                 simulatedOtpCode.textContent = generatedOtp;
                 
                 tempUserData = {
@@ -508,6 +513,32 @@ Guidelines:
                     contact: contact,
                     method: contact.includes('@') ? 'Email OTP' : 'Phone OTP'
                 };
+                
+                try {
+                    // Call Vercel backend function to email OTP directly to user
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            action: 'send-otp',
+                            name: name,
+                            contact: contact,
+                            otp: generatedOtp
+                        })
+                    });
+                    const resData = await response.json();
+                    
+                    if (resData.mockSent) {
+                        console.log('SMTP not configured on Vercel yet. Showing mock OTP for testing.');
+                    }
+                } catch (err) {
+                    console.error('Error dispatching OTP to customer:', err);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
                 
                 // Transition to Step 2
                 authFormStep1.style.display = 'none';
@@ -718,28 +749,32 @@ Guidelines:
     // Update navbar indicators based on localStorage
     function updateAuthUI() {
         const session = JSON.parse(localStorage.getItem('haribot_session'));
+        const isMobile = window.innerWidth <= 768;
         
         if (session) {
             // Hide login buttons
             if (navLoginBtn) navLoginBtn.style.display = 'none';
             if (navLoginBtnMobile) navLoginBtnMobile.style.display = 'none';
             
-            // Show profile menu
-            if (userProfileMenu) userProfileMenu.style.display = 'flex';
-            if (userProfileMenuMobile) userProfileMenuMobile.style.display = 'flex';
+            // Show profile menu only on the correct device width
+            if (userProfileMenu) userProfileMenu.style.display = isMobile ? 'none' : 'flex';
+            if (userProfileMenuMobile) userProfileMenuMobile.style.display = isMobile ? 'flex' : 'none';
             
             // Display visitor name
             const displayName = session.isGuest ? 'Guest' : session.name.split(' ')[0];
             if (userNameDisplay) userNameDisplay.textContent = displayName;
             if (userNameDisplayMobile) userNameDisplayMobile.textContent = displayName;
         } else {
-            // Show login buttons
-            if (navLoginBtn) navLoginBtn.style.display = 'flex';
-            if (navLoginBtnMobile) navLoginBtnMobile.style.display = 'flex';
+            // Show login buttons only on the correct device width
+            if (navLoginBtn) navLoginBtn.style.display = isMobile ? 'none' : 'flex';
+            if (navLoginBtnMobile) navLoginBtnMobile.style.display = isMobile ? 'flex' : 'none';
             
             // Hide profile menu
             if (userProfileMenu) userProfileMenu.style.display = 'none';
             if (userProfileMenuMobile) userProfileMenuMobile.style.display = 'none';
         }
     }
+    
+    // Handle window resize dynamically to adjust displayed buttons
+    window.addEventListener('resize', updateAuthUI);
 });
