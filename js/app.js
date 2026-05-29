@@ -385,6 +385,7 @@ Guidelines:
     // ==========================================
     const loginModal = document.getElementById('loginModal');
     const passwordModal = document.getElementById('passwordModal');
+    const otpNotice = document.getElementById('otpNotice');
     
     // Navbar controls (Desktop)
     const navLoginBtn = document.getElementById('navLoginBtn');
@@ -514,6 +515,7 @@ Guidelines:
                     method: contact.includes('@') ? 'Email OTP' : 'Phone OTP'
                 };
                 
+                let mockSent = true;
                 try {
                     // Call Vercel backend function to email OTP directly to user
                     const response = await fetch('/api/login', {
@@ -530,14 +532,19 @@ Guidelines:
                     });
                     const resData = await response.json();
                     
-                    if (resData.mockSent) {
-                        console.log('SMTP not configured on Vercel yet. Showing mock OTP for testing.');
+                    if (resData && !resData.mockSent) {
+                        mockSent = false;
                     }
                 } catch (err) {
                     console.error('Error dispatching OTP to customer:', err);
                 } finally {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalText;
+                }
+                
+                // Show simulated code on screen ONLY if it was mock-sent (SMTP not configured)
+                if (otpNotice) {
+                    otpNotice.style.display = mockSent ? 'flex' : 'none';
                 }
                 
                 // Transition to Step 2
@@ -746,35 +753,20 @@ Guidelines:
         }
     }
     
-    // Update navbar indicators based on localStorage
+    // Update navbar indicators based on localStorage using CSS state classes
     function updateAuthUI() {
         const session = JSON.parse(localStorage.getItem('haribot_session'));
-        const isMobile = window.innerWidth <= 768;
+        const navbar = document.getElementById('navbar');
         
         if (session) {
-            // Hide login buttons
-            if (navLoginBtn) navLoginBtn.style.display = 'none';
-            if (navLoginBtnMobile) navLoginBtnMobile.style.display = 'none';
-            
-            // Show profile menu only on the correct device width
-            if (userProfileMenu) userProfileMenu.style.display = isMobile ? 'none' : 'flex';
-            if (userProfileMenuMobile) userProfileMenuMobile.style.display = isMobile ? 'flex' : 'none';
+            if (navbar) navbar.classList.add('logged-in');
             
             // Display visitor name
             const displayName = session.isGuest ? 'Guest' : session.name.split(' ')[0];
             if (userNameDisplay) userNameDisplay.textContent = displayName;
             if (userNameDisplayMobile) userNameDisplayMobile.textContent = displayName;
         } else {
-            // Show login buttons only on the correct device width
-            if (navLoginBtn) navLoginBtn.style.display = isMobile ? 'none' : 'flex';
-            if (navLoginBtnMobile) navLoginBtnMobile.style.display = isMobile ? 'flex' : 'none';
-            
-            // Hide profile menu
-            if (userProfileMenu) userProfileMenu.style.display = 'none';
-            if (userProfileMenuMobile) userProfileMenuMobile.style.display = 'none';
+            if (navbar) navbar.classList.remove('logged-in');
         }
     }
-    
-    // Handle window resize dynamically to adjust displayed buttons
-    window.addEventListener('resize', updateAuthUI);
 });

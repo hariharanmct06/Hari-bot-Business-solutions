@@ -1639,7 +1639,7 @@ ul {
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
     :root {
         --nav-height: 70px;
     }
@@ -2189,7 +2189,7 @@ body.loading {
 }
 
 .nav-login-btn-mobile {
-    display: none; /* Hide on desktop by default */
+    display: none;
     width: 100%;
     background: transparent;
     border: 1.5px solid var(--gold-primary);
@@ -2206,7 +2206,7 @@ body.loading {
 }
 
 .user-profile-menu {
-    display: none; /* Controlled by JS based on screen width */
+    display: none; /* Controlled by CSS class state below */
     align-items: center;
     gap: 10px;
     background: rgba(255, 255, 255, 0.02);
@@ -2259,7 +2259,7 @@ body.loading {
 
 /* Mobile Profile Menu */
 .user-profile-menu-mobile {
-    display: none; /* Hide on desktop by default */
+    display: none; /* Controlled by CSS class state below */
     flex-direction: column;
     align-items: center;
     gap: 10px;
@@ -2292,6 +2292,56 @@ body.loading {
     align-items: center;
     justify-content: center;
     gap: 6px;
+}
+
+/* --- Clean CSS-based Navbar Authentication Layout --- */
+
+/* 1. Default logged-out state (desktop: show desktop login, hide all mobile items & profile menu) */
+.navbar .nav-login-btn {
+    display: flex;
+}
+.navbar .user-profile-menu {
+    display: none;
+}
+.navbar .nav-login-btn-mobile,
+.navbar .user-profile-menu-mobile {
+    display: none !important;
+}
+
+/* 2. Logged-in state on desktop */
+.navbar.logged-in .nav-login-btn {
+    display: none !important;
+}
+.navbar.logged-in .user-profile-menu {
+    display: flex;
+}
+.navbar.logged-in .user-profile-menu-mobile {
+    display: none !important;
+}
+
+/* 3. Mobile responsive overrides (widths <= 992px) */
+@media (max-width: 992px) {
+    /* Hide all desktop auth elements */
+    .navbar .nav-login-btn,
+    .navbar.logged-in .user-profile-menu {
+        display: none !important;
+    }
+    
+    /* Toggle mobile login button based on auth state */
+    .navbar:not(.logged-in) .nav-login-btn-mobile {
+        display: flex;
+    }
+    .navbar.logged-in .nav-login-btn-mobile {
+        display: none !important;
+    }
+    
+    /* Toggle mobile profile menu based on auth state */
+    .navbar:not(.logged-in) .user-profile-menu-mobile {
+        display: none !important;
+    }
+    .navbar.logged-in .user-profile-menu-mobile {
+        display: flex;
+    }
 }
 
 /* Overlay and Card */
