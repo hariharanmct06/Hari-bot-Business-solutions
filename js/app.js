@@ -170,6 +170,7 @@ Here is the company information:
   2. Web Design & Development: Lightning-fast, secure, responsive corporate websites.
   3. Personalized AI Chatbots: Custom chatbots trained on company data (like this one).
   4. Task Automation using AI: Connecting apps via n8n, Python automation pipelines, saving 40+ hours/week.
+  5. Digital Marketing using AI: Predictive analytics, automated content generation, and smart ad targeting to maximize campaign ROI.
 - Company Contact:
   - Official Website: https://hari-bot-business-solutions.vercel.app/ (This is our only website. Note that we do NOT have any .com domain, only this Vercel URL)
   - Email: haribotbusinesssolutions@gmail.com
