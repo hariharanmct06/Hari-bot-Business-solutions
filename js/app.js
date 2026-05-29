@@ -34,6 +34,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (preloader) {
                 preloader.style.display = 'none';
             }
+            
+            // Auto-trigger login modal on entrance if no active session exists
+            const session = localStorage.getItem('haribot_session');
+            if (!session) {
+                showLoginModal();
+            }
         }, 800);
     }, 4200); // 4.2s launch animation + 800ms fadeout = 5.0s total
 
