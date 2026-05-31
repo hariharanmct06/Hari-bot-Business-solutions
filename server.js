@@ -88,10 +88,7 @@ const server = http.createServer((req, res) => {
         return;
     }
 
-    if (req.url === '/api/login' && req.method === 'POST') {
-        const loginHandler = require('./api/login.js');
-        return loginHandler(req, res);
-    }
+
 
     // 2. Serve Web Page Files (HTML, CSS, JS, Images)
     let filePath = path.join(__dirname, req.url === '/' ? 'index.html' : req.url);

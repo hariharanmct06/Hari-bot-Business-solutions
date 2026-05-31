@@ -4,9 +4,7 @@
   "description": "Corporate website for Hari Bot & Business Solutions",
   "main": "server.js",
   "type": "commonjs",
-  "dependencies": {
-    "nodemailer": "^6.9.13"
-  },
+  "dependencies": {},
   "engines": {
     "node": ">=18.0.0"
   }
